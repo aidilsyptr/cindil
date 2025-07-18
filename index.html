@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome To Cindil Web</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    body.content-active {
+      overflow: auto;
+    }
+
+    #landing {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #800000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+      padding: 30px;
+    }
+
+    #landing h1 {
+      font-size: 1.6em;
+      margin-bottom: 20px;
+    }
+
+    #enter-btn {
+      background-color: white;
+      color: #800000;
+      font-weight: bold;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #enter-btn:hover {
+      background-color: #ffd5d5;
+    }
+
+    audio {
+      display: none;
+    }
+
+    header {
+      background-color: #800000;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+      gap: 10px;
+    }
+
+    .gallery-item {
+      max-width: 200px;
+      max-height: 200px;
+      overflow: hidden;
+    }
+
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="landing">
+    <h1>
+      Hai, terimakasih sudah mengunjungi website Cindil,<br />
+      bagi kalian yang punya pacar share website ini biar pacar kamu buatin kamu juga.<br />
+      Dan kalian yang jomblo, yakin mau kunjungin website kami?? jangan iwriiii yaaaaa 🥹
+    </h1>
+    <button id="enter-btn">Mau lihatt!!!</button>
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="media/song.mp3" type="audio/mpeg" />
+  </audio>
+
+  <header>Welcome To Cindil Web</header>
+  <section class="gallery" id="gallery"></section>
+
+  <script>
+    document.getElementById('enter-btn').addEventListener('click', function () {
+      document.getElementById('landing').style.display = 'none';
+      document.body.classList.add('content-active');
+      const music = document.getElementById('bg-music');
+      music.play().catch(err => console.log('Autoplay blocked:', err));
+    });
+
+    const gallery = document.getElementById('gallery');
+    const mediaExtensions = ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'mov', 'webm'];
+    const videoExtensions = ['mp4', 'mov', 'webm'];
+
+    for (let i = 1; i <= 50; i++) {
+      for (let ext of mediaExtensions) {
+        const filePath = `media/${i}.${ext}`;
+        const isVideo = videoExtensions.includes(ext.toLowerCase());
+
+        const mediaElement = document.createElement(isVideo ? 'video' : 'img');
+        mediaElement.src = filePath;
+
+        if (isVideo) {
+          mediaElement.autoplay = true;
+          mediaElement.loop = true;
+          mediaElement.muted = true;
+          mediaElement.playsInline = true;
+        } else {
+          mediaElement.alt = `Media ${i}`;
+        }
+
+        const container = document.createElement('div');
+        container.classList.add('gallery-item');
+        container.appendChild(mediaElement);
+
+        mediaElement.onerror = () => container.remove();
+
+        gallery.appendChild(container);
+      }
+    }
+  </script>
+</body>
+</html>
