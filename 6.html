@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galeri Kenangan</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: #fdfdfd;
+      color: #333;
+    }
+
+    /* HALAMAN WELCOME */
+    #welcome {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(to right, #ffafbd, #ffc3a0);
+    }
+
+    #welcome h1 {
+      font-size: 2em;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    #welcome p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    #start-btn {
+      padding: 15px 30px;
+      font-size: 16px;
+      background-color: #fff;
+      color: #e91e63;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-weight: bold;
+    }
+
+    #start-btn:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* HALAMAN GALERI */
+    #gallery {
+      display: none;
+      padding: 20px;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .media-item {
+      background: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    video {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .no-media {
+      text-align: center;
+      grid-column: 1/-1;
+      color: #888;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Halaman Welcome -->
+<section id="welcome">
+  <h1>Terima kasih telah mengunjungi website kami</h1>
+  <p>Ini adalah galeri kenangan kami sebagai pasangan 💖</p>
+  <button id="start-btn">Yuk Lihat</button>
+</section>
+
+<!-- Halaman Galeri -->
+<section id="gallery">
+  <header>
+    <h1>Galeri Video Kami</h1>
+    <p>Kenangan indah dalam bentuk video 🎥</p>
+  </header>
+  <div id="videos" class="content"></div>
+</section>
+
+<!-- Backsound -->
+<audio id="background-music" loop>
+  <source src="media/song.mp3" type="audio/mp3">
+  Browser Anda tidak mendukung audio.
+</audio>
+
+<script>
+  const startBtn = document.getElementById('start-btn');
+  const welcomePage = document.getElementById('welcome');
+  const galleryPage = document.getElementById('gallery');
+  const music = document.getElementById('background-music');
+  const videoContainer = document.getElementById('videos');
+
+  const checkVideoExists = (url, callback) => {
+    const video = document.createElement("video");
+    video.onloadeddata = () => callback(true, url);
+    video.onerror = () => callback(false, url);
+    video.src = url;
+  };
+
+  // Saat tombol "Yuk Lihat" ditekan
+  startBtn.addEventListener('click', () => {
+    // Sembunyikan halaman welcome, tampilkan galeri
+    welcomePage.style.display = 'none';
+    galleryPage.style.display = 'block';
+
+    // Mulai musik
+    music.volume = 0.5;
+    music.play().catch(() => {
+      alert("Silakan aktifkan audio Anda untuk mendengarkan backsound.");
+    });
+
+    // Tampilkan video yang tersedia
+    for (let i = 1; i <= 50; i++) {
+      const path = `media/${i}.mp4`;
+      checkVideoExists(path, (exists, url) => {
+        if (exists) {
+          const item = document.createElement("div");
+          item.className = "media-item";
+          item.innerHTML = `
+            <video autoplay loop muted playsinline>
+              <source src="${url}" type="video/mp4">
+              Browser Anda tidak mendukung video.
+            </video>`;
+          videoContainer.appendChild(item);
+        }
+      });
+    }
+
+    // Jika tidak ada video yang ditemukan
+    setTimeout(() => {
+      if (!videoContainer.children.length) {
+        const msg = document.createElement("div");
+        msg.className = "no-media";
+        msg.innerText = "Tidak ada video yang tersedia di folder media.";
+        videoContainer.appendChild(msg);
+      }
+    }, 2000);
+  });
+</script>
+
+</body>
+</html>
