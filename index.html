@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CindilUniverse</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: #fff;
+      color: #333;
+    }
+
+    #welcome {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(to right, #ffafbd, #ffc3a0);
+    }
+
+    #welcome h1 {
+      font-size: 2em;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    #welcome p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    #start-btn {
+      padding: 15px 30px;
+      font-size: 16px;
+      background-color: #fff;
+      color: #e91e63;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #gallery {
+      display: none;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .content {
+      column-count: 3;
+      column-gap: 4px;
+      padding: 6px;
+    }
+
+    .media-item {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 4px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .content {
+        column-count: 1;
+      }
+    }
+
+    audio {
+      display: none;
+    }
+
+    /* LIGHTBOX FULLSCREEN VIDEO */
+    #lightbox {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+    }
+
+    #lightbox video {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+
+    #close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #prev-btn { left: 20px; }
+    #next-btn { right: 20px; }
+  </style>
+</head>
+<body>
+
+<!-- Welcome Page -->
+<section id="welcome">
+  <h1>Thanks udah mau ngunjungin website kami</h1>
+  <p>Jadiiii, inituh website simple tapi lucuu dari kamii... 💖</p>
+  <button id="start-btn">Yuk Lihat</button>
+</section>
+
+<!-- Gallery Page -->
+<section id="gallery">
+  <header>
+    <h1>Cindil Universe Archive</h1>
+    <p>Kenangan kami dalam bentuk video 🎥</p>
+  </header>
+  <div id="videos" class="content"></div>
+</section>
+
+<!-- Audio Backsound -->
+<audio id="background-music" loop>
+  <source src="media/song.mp3" type="audio/mp3">
+  Browser Anda tidak mendukung audio.
+</audio>
+
+<!-- Fullscreen Lightbox -->
+<div id="lightbox">
+  <button id="close-btn">×</button>
+  <button id="prev-btn" class="arrow-btn">‹</button>
+  <video id="lightbox-video" controls autoplay></video>
+  <button id="next-btn" class="arrow-btn">›</button>
+</div>
+
+<script>
+  const startBtn = document.getElementById('start-btn');
+  const welcomePage = document.getElementById('welcome');
+  const galleryPage = document.getElementById('gallery');
+  const music = document.getElementById('background-music');
+  const videoContainer = document.getElementById('videos');
+
+  const lightbox = document.getElementById('lightbox');
+  const lightboxVideo = document.getElementById('lightbox-video');
+  const closeBtn = document.getElementById('close-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  let videoList = [];
+  let currentIndex = 0;
+
+  // Cek video exist
+  const checkVideoExists = (url, callback) => {
+    const video = document.createElement("video");
+    video.onloadeddata = () => callback(true, url);
+    video.onerror = () => callback(false, url);
+    video.src = url;
+  };
+
+  // Tombol masuk
+  startBtn.addEventListener('click', () => {
+    welcomePage.style.display = 'none';
+    galleryPage.style.display = 'block';
+    music.volume = 0.5;
+    music.play().catch(() => alert("Silakan aktifkan audio Anda."));
+
+    for (let i = 1; i <= 50; i++) {
+      const path = `media/${i}.mp4`;
+      checkVideoExists(path, (exists, url) => {
+        if (exists) {
+          const item = document.createElement("div");
+          item.className = "media-item";
+          item.innerHTML = `
+            <video autoplay loop muted playsinline onclick="openLightbox(${videoList.length})">
+              <source src="${url}" type="video/mp4">
+            </video>`;
+          videoList.push(url);
+          videoContainer.appendChild(item);
+        }
+      });
+    }
+  });
+
+  // Lightbox functions
+  function openLightbox(index) {
+    currentIndex = index;
+    lightboxVideo.src = videoList[index];
+    lightbox.style.display = 'flex';
+  }
+
+  closeBtn.addEventListener('click', () => {
+    lightbox.style.display = 'none';
+    lightboxVideo.pause();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % videoList.length;
+    lightboxVideo.src = videoList[currentIndex];
+    lightboxVideo.play();
+  });
+
+  prevBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + videoList.length) % videoList.length;
+    lightboxVideo.src = videoList[currentIndex];
+    lightboxVideo.play();
+  });
+</script>
+
+</body>
+</html>
