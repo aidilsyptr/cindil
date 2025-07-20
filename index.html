@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CindilUniverse</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Halaman Welcome -->
+<section id="welcome">
+  <h1>Thanks udah mau ngunjungin website kami</h1>
+  <p>Jadiiii, inituh website simple tapi lucuu dari kamii... 💖</p>
+  <button id="start-btn">Yuk Lihat</button>
+</section>
+
+<!-- Halaman Galeri -->
+<section id="gallery">
+  <header>
+    <h1>Cindil Universe Archive</h1>
+    <p>Kenangan kami dalam bentuk video 🎥</p>
+  </header>
+  <div id="videos" class="content"></div>
+</section>
+
+<!-- Backsound -->
+<audio id="background-music" loop>
+  <source src="media/song.mp3" type="audio/mp3">
+  Browser Anda tidak mendukung audio.
+</audio>
+
+<script>
+  const startBtn = document.getElementById('start-btn');
+  const welcomePage = document.getElementById('welcome');
+  const galleryPage = document.getElementById('gallery');
+  const music = document.getElementById('background-music');
+  const videoContainer = document.getElementById('videos');
+
+  const checkVideoExists = (url, callback) => {
+    const video = document.createElement("video");
+    video.onloadeddata = () => callback(true, url);
+    video.onerror = () => callback(false, url);
+    video.src = url;
+  };
+
+  startBtn.addEventListener('click', () => {
+    welcomePage.style.display = 'none';
+    galleryPage.style.display = 'block';
+
+    music.volume = 0.5;
+    music.play().catch(() => {
+      alert("Silakan aktifkan audio Anda untuk mendengarkan backsound.");
+    });
+
+    for (let i = 1; i <= 50; i++) {
+      const path = `media/${i}.mp4`;
+      checkVideoExists(path, (exists, url) => {
+        if (exists) {
+          const item = document.createElement("div");
+          item.className = "media-item";
+          item.innerHTML = `
+            <video autoplay loop muted playsinline>
+              <source src="${url}" type="video/mp4">
+              Browser Anda tidak mendukung video.
+            </video>`;
+          videoContainer.appendChild(item);
+        }
+      });
+    }
+
+    setTimeout(() => {
+      if (!videoContainer.children.length) {
+        const msg = document.createElement("div");
+        msg.className = "no-media";
+        msg.innerText = "Tidak ada video yang tersedia di folder media.";
+        videoContainer.appendChild(msg);
+      }
+    }, 2000);
+  });
+</script>
+
+</body>
+</html>
