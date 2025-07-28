@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CindilUniverse Modern</title>
+    <style>
+         :root {
+            --primary: #ffffff;
+            --accent: #ff80ab;
+            --dark: #111;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        body,
+        html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        /* Animated Background */
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #ffd6e0, #d4c1ec, #c3ecff, #fdf6e3);
+            background-size: 800% 800%;
+            animation: gradientMove 30s ease infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        section#welcome,
+        section#gallery {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+        
+        section#welcome h1,
+        section#welcome p {
+            color: #fff;
+            mix-blend-mode: difference;
+            margin-bottom: 1rem;
+        }
+        
+        #start-btn {
+            padding: 14px 28px;
+            border-radius: 30px;
+            border: none;
+            background: var(--primary);
+            color: var(--accent);
+            font-weight: bold;
+            box-shadow: 0 8px 20px var(--shadow);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        #start-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        #gallery {
+            display: none;
+        }
+        
+        header {
+            padding: 2rem;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        header p {
+            color: #333;
+        }
+        
+        .content {
+            column-count: 3;
+            column-gap: 1rem;
+            padding: 1rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .media-item {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px var(--shadow);
+            background: #fff;
+        }
+        
+        .media-item img,
+        .media-item video {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                column-count: 2;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content {
+                column-count: 1;
+            }
+        }
+        
+        #lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        #lightbox img,
+        #lightbox video {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 12px;
+        }
+        
+        #close-btn,
+        .arrow-btn {
+            position: absolute;
+            top: 20px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        
+        #close-btn {
+            right: 20px;
+        }
+        
+        #prev-btn,
+        #next-btn {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        #prev-btn {
+            left: 20px;
+        }
+        
+        #next-btn {
+            right: 20px;
+        }
+        
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Welcome Page -->
+    <section id="welcome">
+        <h1>Thanks udah mau ngunjungin website kami</h1>
+        <p>Jadiiii, inituh website simple tapi lucuu dari kamii... 💖</p>
+        <button id="start-btn">Yuk Lihat</button>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery">
+        <header>
+            <h1>Cindil Universe Archive</h1>
+            <p>Kenangan kami dalam bentuk gambar dan video 🎥🖼️</p>
+        </header>
+        <div id="media" class="content"></div>
+    </section>
+
+    <!-- Music -->
+    <audio id="background-music" loop>
+    <source src="media/song.mp3" type="audio/mp3" />
+  </audio>
+
+    <!-- Lightbox -->
+    <div id="lightbox">
+        <button id="close-btn">×</button>
+        <button id="prev-btn" class="arrow-btn">‹</button>
+        <img id="lightbox-image" style="display:none;" />
+        <video id="lightbox-video" controls autoplay style="display:none;"></video>
+        <button id="next-btn" class="arrow-btn">›</button>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const welcome = document.getElementById('welcome');
+        const gallery = document.getElementById('gallery');
+        const music = document.getElementById('background-music');
+
+        const mediaContainer = document.getElementById('media');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxVideo = document.getElementById('lightbox-video');
+        const closeBtn = document.getElementById('close-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        let mediaList = [];
+        let currentIndex = 0;
+
+        const loadMedia = () => {
+            const maxFiles = 100;
+            for (let i = 1; i <= maxFiles; i++) {
+                const imgPath = `media/${i}.jpg`;
+                const videoPath = `media/${i}.mp4`;
+
+                const img = new Image();
+                img.onload = () => addMedia('image', imgPath);
+                img.onerror = () => {
+                    const video = document.createElement("video");
+                    video.onloadeddata = () => addMedia('video', videoPath);
+                    video.onerror = () => {};
+                    video.src = videoPath;
+                };
+                img.src = imgPath;
+            }
+        };
+
+        const addMedia = (type, url) => {
+            const index = mediaList.length;
+            mediaList.push({
+                type,
+                url
+            });
+
+            const item = document.createElement("div");
+            item.className = "media-item";
+
+            if (type === 'image') {
+                item.innerHTML = `<img src="${url}" onclick="openLightbox(${index})">`;
+            } else {
+                item.innerHTML = `<video autoplay muted loop playsinline onclick="openLightbox(${index})"><source src="${url}" type="video/mp4"></video>`;
+            }
+
+            mediaContainer.appendChild(item);
+        };
+
+        window.openLightbox = function(index) {
+            currentIndex = index;
+            const media = mediaList[index];
+
+            if (media.type === 'image') {
+                lightboxImage.src = media.url;
+                lightboxImage.style.display = 'block';
+                lightboxVideo.style.display = 'none';
+                lightboxVideo.pause();
+            } else {
+                lightboxVideo.src = media.url;
+                lightboxVideo.style.display = 'block';
+                lightboxImage.style.display = 'none';
+                lightboxVideo.play();
+            }
+
+            lightbox.style.display = 'flex';
+        };
+
+        closeBtn.addEventListener('click', () => {
+            lightbox.style.display = 'none';
+            lightboxVideo.pause();
+            lightboxImage.src = '';
+            lightboxVideo.src = '';
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % mediaList.length;
+            openLightbox(currentIndex);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + mediaList.length) % mediaList.length;
+            openLightbox(currentIndex);
+        });
+
+        startBtn.addEventListener('click', () => {
+            welcome.style.display = 'none';
+            gallery.style.display = 'flex';
+            loadMedia();
+            music.play().catch(() => alert("Silakan aktifkan audio Anda."));
+        });
+    </script>
+
+</body>
+
+</html>
